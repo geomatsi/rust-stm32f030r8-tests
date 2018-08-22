@@ -24,20 +24,20 @@ fn main() -> ! {
     let rcc = &peripherals.RCC;
 
     // enable GPIOA peripheral clock
-    rcc.ahbenr.modify(|_, w| w.iopaen().set_bit());
+    rcc.ahbenr.write(|w| w.iopaen().set_bit());
 
     // configure PA5 as output pin
-    gpioa.moder.modify(|_, w| w.moder5().output());
+    gpioa.moder.write(|w| w.moder5().output());
 
     // configure PA5 pin as pull-down
-    gpioa.pupdr.modify(|_, w| w.pupdr5().pull_down());
+    gpioa.pupdr.write(|w| w.pupdr5().pull_down());
 
     loop {
         writeln!(stdout, "Hello World!").unwrap();
 
-        gpioa.odr.modify(|_, w| w.odr5().set_bit());
+        gpioa.odr.write(|w| w.odr5().set_bit());
         delay(3000);
-        gpioa.odr.modify(|_, w| w.odr5().clear_bit());
+        gpioa.odr.write(|w| w.odr5().clear_bit());
         delay(1000);
     }
 }
