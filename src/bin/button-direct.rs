@@ -1,24 +1,26 @@
 #![no_main]
 #![no_std]
 
-#[macro_use(entry, exception)]
 extern crate cortex_m_rt as rt;
+use rt::entry;
+use rt::exception;
+use rt::ExceptionFrame;
+
 extern crate cortex_m as cm;
 
 extern crate cortex_m_semihosting as sh;
+use sh::hio;
+use sh::hio::HStdout;
+
 extern crate panic_semihosting;
 
 #[macro_use(interrupt)]
 extern crate stm32f0;
-
-use core::fmt::Write;
-use rt::ExceptionFrame;
-use sh::hio;
-use sh::hio::HStdout;
 use stm32f0::stm32f0x0;
 
-entry!(main);
+use core::fmt::Write;
 
+#[entry]
 fn main() -> ! {
     let mut core_periph = cm::peripheral::Peripherals::take().unwrap();
     let soc_periph = stm32f0x0::Peripherals::take().unwrap();
@@ -89,15 +91,13 @@ fn delay(count: u32) {
     }
 }
 
-exception!(HardFault, hard_fault);
-
-fn hard_fault(ef: &ExceptionFrame) -> ! {
+#[exception]
+fn HardFault(ef: &ExceptionFrame) -> ! {
     panic!("HardFault at {:#?}", ef);
 }
 
-exception!(*, default_handler);
-
-fn default_handler(irqn: i16) {
+#[exception]
+fn DefaultHandler(irqn: i16) {
     panic!("Unhandled exception (IRQn = {})", irqn);
 }
 

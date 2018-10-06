@@ -1,25 +1,25 @@
-#![feature(panic_implementation)]
 #![no_main]
 #![no_std]
 
-#[macro_use(entry, exception)]
 extern crate cortex_m_rt as rt;
+use rt::entry;
+use rt::exception;
+
 extern crate cortex_m as cm;
 
 extern crate stm32f0;
-
-use core::panic::PanicInfo;
 use stm32f0::stm32f0x0;
 
-#[panic_implementation]
+use core::panic::PanicInfo;
+
+#[panic_handler]
 fn panic(_panic: &PanicInfo) -> ! {
     loop {
         cm::asm::bkpt();
     }
 }
 
-entry!(main);
-
+#[entry]
 fn main() -> ! {
     let peripherals = stm32f0x0::Peripherals::take().unwrap();
 
@@ -61,8 +61,7 @@ fn delay(count: u32) {
     }
 }
 
-exception!(*, default_handler);
-
-fn default_handler(irqn: i16) {
+#[exception]
+fn DefaultHandler(irqn: i16) {
     panic!("Unhandled exception (IRQn = {})", irqn);
 }
