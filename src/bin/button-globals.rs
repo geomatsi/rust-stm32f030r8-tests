@@ -99,7 +99,8 @@ fn setup_interrupts(p_core: &mut cm::peripheral::Peripherals, p_soc: &stm32f0x0:
     unsafe {
         nvic.set_priority(stm32f0x0::Interrupt::EXTI4_15, 1);
     }
-    nvic.clear_pending(stm32f0x0::Interrupt::EXTI4_15);
+
+    cm::peripheral::NVIC::unpend(stm32f0x0::Interrupt::EXTI4_15);
 }
 
 fn delay(count: u32) {

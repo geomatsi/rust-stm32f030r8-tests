@@ -83,7 +83,8 @@ fn setup_interrupts(p_core: &mut cm::peripheral::Peripherals) {
     unsafe {
         nvic.set_priority(stm32f0x0::Interrupt::TIM3, 1);
     }
-    nvic.clear_pending(stm32f0x0::Interrupt::TIM3);
+
+    cm::peripheral::NVIC::unpend(stm32f0x0::Interrupt::TIM3);
 }
 
 fn delay(count: u32) {
