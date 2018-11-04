@@ -8,17 +8,14 @@ use rt::ExceptionFrame;
 
 extern crate cortex_m as cm;
 
-extern crate cortex_m_semihosting as sh;
-use sh::hio;
-use sh::hio::HStdout;
+#[macro_use(hprint)]
+extern crate cortex_m_semihosting;
 
 extern crate panic_semihosting;
 
 #[macro_use(interrupt)]
 extern crate stm32f0;
 use stm32f0::stm32f0x0;
-
-use core::fmt::Write;
 
 #[entry]
 fn main() -> ! {
@@ -102,13 +99,9 @@ fn DefaultHandler(irqn: i16) {
     panic!("Unhandled exception (IRQn = {})", irqn);
 }
 
-interrupt!(EXTI4_15, button, state: Option<HStdout> = None);
+interrupt!(EXTI4_15, button);
 
-fn button(state: &mut Option<HStdout>) {
-    if state.is_none() {
-        *state = Some(hio::hstdout().unwrap());
-    }
-
+fn button() {
     unsafe {
         (*stm32f0::stm32f0x0::GPIOA::ptr())
             .odr
@@ -126,11 +119,9 @@ fn button(state: &mut Option<HStdout>) {
             .is_high()
     };
 
-    if let Some(hstdout) = state.as_mut() {
-        if is_high {
-            hstdout.write_str("p").unwrap();
-        } else {
-            hstdout.write_str("r").unwrap();
-        }
+    if is_high {
+        hprint!("p").unwrap();
+    } else {
+        hprint!("r").unwrap();
     }
 }

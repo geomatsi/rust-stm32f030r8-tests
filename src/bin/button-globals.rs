@@ -8,8 +8,8 @@ use rt::ExceptionFrame;
 
 extern crate cortex_m as cm;
 
-extern crate cortex_m_semihosting as sh;
-use sh::hio;
+#[macro_use(hprintln)]
+extern crate cortex_m_semihosting;
 
 extern crate panic_semihosting;
 
@@ -18,8 +18,6 @@ extern crate stm32f0;
 use stm32f0::stm32f0x0;
 use stm32f0::stm32f0x0::exti;
 use stm32f0::stm32f0x0::gpioa;
-
-use core::fmt::Write;
 
 struct ExtiRegWrapper(&'static exti::RegisterBlock);
 unsafe impl Sync for ExtiRegWrapper {}
@@ -34,7 +32,6 @@ static mut GPIO: Option<GpioaRegWrapper> = None;
 fn main() -> ! {
     let mut core_periph = cm::peripheral::Peripherals::take().unwrap();
     let soc_periph = stm32f0x0::Peripherals::take().unwrap();
-    let mut stdout = hio::hstdout().unwrap();
     let led = &soc_periph.GPIOA;
 
     unsafe {
@@ -48,7 +45,7 @@ fn main() -> ! {
 
     loop {
         led.odr.modify(|r, w| w.odr5().bit(!r.odr5().bit()));
-        writeln!(stdout, "OK").unwrap();
+        hprintln!("OK").unwrap();
         delay(10000);
     }
 }

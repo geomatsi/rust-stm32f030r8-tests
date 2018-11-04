@@ -8,17 +8,14 @@ use rt::ExceptionFrame;
 
 extern crate cortex_m as cm;
 
-extern crate cortex_m_semihosting as sh;
-use sh::hio;
-use sh::hio::HStdout;
+#[macro_use(hprintln)]
+extern crate cortex_m_semihosting;
 
 extern crate panic_semihosting;
 
 #[macro_use(interrupt)]
 extern crate stm32f0;
 use stm32f0::stm32f0x0;
-
-use core::fmt::Write;
 
 #[entry]
 fn main() -> ! {
@@ -103,12 +100,8 @@ fn DefaultHandler(irqn: i16) {
     panic!("Unhandled exception (IRQn = {})", irqn);
 }
 
-interrupt!(TIM3, timer_tim3, state: Option<HStdout> = None);
-fn timer_tim3(state: &mut Option<HStdout>) {
-    if state.is_none() {
-        *state = Some(hio::hstdout().unwrap());
-    }
-
+interrupt!(TIM3, timer_tim3);
+fn timer_tim3() {
     unsafe {
         (*stm32f0::stm32f0x0::GPIOA::ptr())
             .odr
@@ -119,7 +112,5 @@ fn timer_tim3(state: &mut Option<HStdout>) {
             .modify(|_, w| w.uif().clear_bit());
     }
 
-    if let Some(hstdout) = state.as_mut() {
-        writeln!(hstdout, "TOGGLE").unwrap();
-    }
+    hprintln!("TOGGLE").unwrap();
 }

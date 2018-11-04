@@ -8,20 +8,16 @@ use rt::ExceptionFrame;
 
 extern crate cortex_m as cm;
 
-extern crate cortex_m_semihosting as sh;
-use sh::hio;
+#[macro_use(hprintln)]
+extern crate cortex_m_semihosting;
 
 extern crate panic_semihosting;
 
 extern crate stm32f0;
 use stm32f0::stm32f0x0;
 
-use core::fmt::Write;
-
 #[entry]
 fn main() -> ! {
-    let mut stdout = hio::hstdout().unwrap();
-
     let peripherals = stm32f0x0::Peripherals::take().unwrap();
     let gpioa = &peripherals.GPIOA;
     let rcc = &peripherals.RCC;
@@ -36,7 +32,7 @@ fn main() -> ! {
     gpioa.pupdr.write(|w| w.pupdr5().pull_down());
 
     loop {
-        writeln!(stdout, "Hello World!").unwrap();
+        hprintln!("Hello World!").unwrap();
 
         gpioa.odr.write(|w| w.odr5().set_bit());
         delay(3000);
