@@ -8,8 +8,8 @@ use rt::ExceptionFrame;
 
 extern crate cortex_m as cm;
 
-#[macro_use(hprintln)]
 extern crate cortex_m_semihosting;
+use cortex_m_semihosting::hprintln;
 
 extern crate panic_semihosting;
 

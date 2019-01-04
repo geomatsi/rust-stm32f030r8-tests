@@ -8,16 +8,16 @@ use rt::ExceptionFrame;
 
 extern crate cortex_m as cm;
 
-#[macro_use(hprintln)]
 extern crate cortex_m_semihosting;
+use cortex_m_semihosting::hprintln;
 
 extern crate panic_semihosting;
 
-#[macro_use(interrupt)]
 extern crate stm32f0;
 use stm32f0::stm32f0x0;
 use stm32f0::stm32f0x0::exti;
 use stm32f0::stm32f0x0::gpioa;
+use stm32f0::stm32f0x0::interrupt;
 
 struct ExtiRegWrapper(&'static exti::RegisterBlock);
 unsafe impl Sync for ExtiRegWrapper {}
@@ -116,8 +116,8 @@ fn DefaultHandler(irqn: i16) {
     panic!("Unhandled exception (IRQn = {})", irqn);
 }
 
-interrupt!(EXTI4_15, button);
-fn button() {
+#[interrupt]
+fn EXTI4_15() {
     unsafe {
         if let Some(ref gpioa) = GPIO {
             gpioa.0.odr.modify(|r, w| w.odr5().bit(!r.odr5().bit()));

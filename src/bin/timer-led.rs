@@ -8,14 +8,14 @@ use rt::ExceptionFrame;
 
 extern crate cortex_m as cm;
 
-#[macro_use(hprintln)]
 extern crate cortex_m_semihosting;
+use cortex_m_semihosting::hprintln;
 
 extern crate panic_semihosting;
 
-#[macro_use(interrupt)]
 extern crate stm32f0;
 use stm32f0::stm32f0x0;
+use stm32f0::stm32f0x0::interrupt;
 
 #[entry]
 fn main() -> ! {
@@ -100,8 +100,8 @@ fn DefaultHandler(irqn: i16) {
     panic!("Unhandled exception (IRQn = {})", irqn);
 }
 
-interrupt!(TIM3, timer_tim3);
-fn timer_tim3() {
+#[interrupt]
+fn TIM3() {
     unsafe {
         (*stm32f0::stm32f0x0::GPIOA::ptr())
             .odr

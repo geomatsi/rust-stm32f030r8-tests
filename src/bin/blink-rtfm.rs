@@ -1,4 +1,3 @@
-#![deny(unsafe_code)]
 #![deny(warnings)]
 #![no_main]
 #![no_std]
@@ -7,13 +6,16 @@ extern crate cortex_m as cm;
 extern crate cortex_m_rt as rt;
 extern crate panic_semihosting;
 
+extern crate cortex_m_semihosting;
+use cortex_m_semihosting::hprintln;
+
 extern crate stm32f0;
 use stm32f0::stm32f0x0;
 
 extern crate rtfm;
 use rtfm::app;
 
-#[app(device = stm32f0x0)]
+#[app(device = stm32f0::stm32f0x0)]
 const APP: () = {
     // resources
     static tim3: stm32f0x0::TIM3 = ();
@@ -46,8 +48,8 @@ const APP: () = {
             // set timer prescaler: 8MHz/800 => 10000 ticks per second
             device.TIM14.psc.modify(|_, w| w.bits(800));
 
-            // set timer value when interrupt is generated: once per 3 seconds
-            device.TIM14.arr.modify(|_, w| w.bits(30000));
+            // set timer value when interrupt is generated: once per 5 seconds
+            device.TIM14.arr.modify(|_, w| w.bits(50000));
         }
 
         // set timer value when interrupt is generated: once per second
@@ -97,6 +99,7 @@ const APP: () = {
 
     #[interrupt(resources = [tim14])]
     fn TIM14() {
+        hprintln!("TIM14").unwrap();
         (*resources.tim14).sr.modify(|_, w| w.uif().clear_bit());
     }
 };
